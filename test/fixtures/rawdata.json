@@ -1,0 +1,571 @@
+{
+  "routers": {
+    "acme-http@internal": {
+      "entryPoints": [
+        "web"
+      ],
+      "service": "acme-http@internal",
+      "rule": "PathPrefix(`/.well-known/acme-challenge/`)",
+      "ruleSyntax": "default",
+      "priority": 9223372036854775807,
+      "observability": {
+        "accessLogs": true,
+        "metrics": true,
+        "tracing": true,
+        "traceVerbosity": "minimal"
+      },
+      "status": "enabled",
+      "using": [
+        "web"
+      ]
+    },
+    "demo-route-basicauth-c2a80b43067a91a632fe@kubernetescrd": {
+      "entryPoints": [
+        "web"
+      ],
+      "middlewares": [
+        "demo-basic-auth@kubernetescrd"
+      ],
+      "service": "demo-route-basicauth-c2a80b43067a91a632fe",
+      "rule": "PathPrefix(`/basic-auth`)",
+      "priority": 25,
+      "observability": {
+        "accessLogs": true,
+        "metrics": true,
+        "tracing": true,
+        "traceVerbosity": "minimal",
+        "metadata": {
+          "ingress": {
+            "namespace": "demo",
+            "name": "route-basicauth",
+            "kind": "IngressRoute"
+          }
+        }
+      },
+      "status": "enabled",
+      "using": [
+        "web"
+      ]
+    },
+    "demo-whoami-6ac511fd28173da9680d@kubernetescrd": {
+      "entryPoints": [
+        "web"
+      ],
+      "middlewares": [
+        "demo-add-headers-ingressroute@kubernetescrd"
+      ],
+      "service": "demo-whoami-6ac511fd28173da9680d",
+      "rule": "PathPrefix(`/passthrough`) && Query(`route`, `ingressroute`)",
+      "priority": 60,
+      "observability": {
+        "accessLogs": true,
+        "metrics": true,
+        "tracing": true,
+        "traceVerbosity": "minimal",
+        "metadata": {
+          "ingress": {
+            "namespace": "demo",
+            "name": "whoami",
+            "kind": "IngressRoute"
+          }
+        }
+      },
+      "status": "enabled",
+      "using": [
+        "web"
+      ]
+    },
+    "demo-whoami-acme-c414194b8e81f8036db5@kubernetescrd": {
+      "entryPoints": [
+        "websecure"
+      ],
+      "service": "demo-whoami-acme-c414194b8e81f8036db5",
+      "rule": "Host(`api.traefik-hub.test`)",
+      "priority": 28,
+      "tls": {
+        "certResolver": "step"
+      },
+      "observability": {
+        "accessLogs": true,
+        "metrics": true,
+        "tracing": true,
+        "traceVerbosity": "minimal",
+        "metadata": {
+          "ingress": {
+            "namespace": "demo",
+            "name": "whoami-acme",
+            "kind": "IngressRoute"
+          }
+        }
+      },
+      "status": "enabled",
+      "using": [
+        "websecure"
+      ]
+    },
+    "demo-whoami-acme-http-c414194b8e81f8036db5@kubernetescrd": {
+      "entryPoints": [
+        "web"
+      ],
+      "middlewares": [
+        "demo-https-redirect@kubernetescrd"
+      ],
+      "service": "demo-whoami-acme-http-c414194b8e81f8036db5",
+      "rule": "Host(`api.traefik-hub.test`)",
+      "priority": 28,
+      "observability": {
+        "accessLogs": true,
+        "metrics": true,
+        "tracing": true,
+        "traceVerbosity": "minimal",
+        "metadata": {
+          "ingress": {
+            "namespace": "demo",
+            "name": "whoami-acme-http",
+            "kind": "IngressRoute"
+          }
+        }
+      },
+      "status": "enabled",
+      "using": [
+        "web"
+      ]
+    },
+    "demo-whoami-passthrough@kubernetes": {
+      "entryPoints": [
+        "web"
+      ],
+      "middlewares": [
+        "demo-add-headers-ingress@kubernetescrd"
+      ],
+      "service": "demo-whoami-80",
+      "rule": "PathPrefix(\"/passthrough\")",
+      "priority": 26,
+      "observability": {
+        "accessLogs": true,
+        "metrics": true,
+        "tracing": true,
+        "traceVerbosity": "minimal",
+        "metadata": {
+          "ingress": {
+            "namespace": "demo",
+            "name": "whoami",
+            "kind": "Ingress"
+          }
+        }
+      },
+      "status": "enabled",
+      "using": [
+        "web"
+      ]
+    },
+    "httproute-demo-whoami-gw-traefik-traefik-gateway-ep-web-0-331fddd6b23b5d9c50f0@kubernetesgateway": {
+      "entryPoints": [
+        "web"
+      ],
+      "middlewares": [
+        "demo-add-headers-httproute@kubernetescrd"
+      ],
+      "service": "httproute-demo-whoami-gw-traefik-traefik-gateway-ep-web-0-331fddd6b23b5d9c50f0-wrr",
+      "rule": "(Path(\"/passthrough\") || PathPrefix(\"/passthrough/\")) && Query(\"route\",\"httproute\")",
+      "ruleSyntax": "default",
+      "priority": 11211,
+      "observability": {
+        "accessLogs": true,
+        "metrics": true,
+        "tracing": true,
+        "traceVerbosity": "minimal"
+      },
+      "status": "enabled",
+      "using": [
+        "web"
+      ]
+    },
+    "ping@internal": {
+      "entryPoints": [
+        "traefik"
+      ],
+      "service": "ping@internal",
+      "rule": "PathPrefix(`/ping`)",
+      "ruleSyntax": "default",
+      "priority": 9223372036854775807,
+      "observability": {
+        "accessLogs": true,
+        "metrics": true,
+        "tracing": true,
+        "traceVerbosity": "minimal"
+      },
+      "status": "enabled",
+      "using": [
+        "traefik"
+      ]
+    },
+    "prometheus@internal": {
+      "entryPoints": [
+        "metrics"
+      ],
+      "service": "prometheus@internal",
+      "rule": "PathPrefix(`/metrics`)",
+      "ruleSyntax": "default",
+      "priority": 9223372036854775807,
+      "observability": {
+        "accessLogs": true,
+        "metrics": true,
+        "tracing": true,
+        "traceVerbosity": "minimal"
+      },
+      "status": "enabled",
+      "using": [
+        "metrics"
+      ]
+    },
+    "traefik-traefik-dashboard-d012b7f875133eeab4e5@kubernetescrd": {
+      "entryPoints": [
+        "traefik"
+      ],
+      "service": "api@internal",
+      "rule": "PathPrefix(`/dashboard`) || PathPrefix(`/api`)",
+      "priority": 46,
+      "observability": {
+        "accessLogs": true,
+        "metrics": true,
+        "tracing": true,
+        "traceVerbosity": "minimal",
+        "metadata": {
+          "ingress": {
+            "namespace": "traefik",
+            "name": "traefik-dashboard",
+            "kind": "IngressRoute"
+          }
+        }
+      },
+      "status": "enabled",
+      "using": [
+        "traefik"
+      ]
+    },
+    "whoami@file": {
+      "entryPoints": [
+        "web"
+      ],
+      "middlewares": [
+        "addHeaders@file"
+      ],
+      "service": "whoami-passthrough",
+      "rule": "PathPrefix(`/passthrough`) && Query(`route`, `file`)",
+      "priority": 52,
+      "observability": {
+        "accessLogs": true,
+        "metrics": true,
+        "tracing": true,
+        "traceVerbosity": "minimal"
+      },
+      "status": "enabled",
+      "using": [
+        "web"
+      ]
+    }
+  },
+  "middlewares": {
+    "addHeaders@file": {
+      "headers": {
+        "customResponseHeaders": {
+          "X-Demo-Route": "file"
+        }
+      },
+      "status": "enabled",
+      "usedBy": [
+        "whoami@file"
+      ]
+    },
+    "demo-add-headers-httproute@kubernetescrd": {
+      "headers": {
+        "customResponseHeaders": {
+          "X-Demo-Route": "httproute"
+        }
+      },
+      "status": "enabled",
+      "usedBy": [
+        "httproute-demo-whoami-gw-traefik-traefik-gateway-ep-web-0-331fddd6b23b5d9c50f0@kubernetesgateway"
+      ]
+    },
+    "demo-add-headers-ingress@kubernetescrd": {
+      "headers": {
+        "customResponseHeaders": {
+          "X-Demo-Route": "ingress"
+        }
+      },
+      "status": "enabled",
+      "usedBy": [
+        "demo-whoami-passthrough@kubernetes"
+      ]
+    },
+    "demo-add-headers-ingressroute@kubernetescrd": {
+      "headers": {
+        "customResponseHeaders": {
+          "X-Demo-Route": "ingressroute"
+        }
+      },
+      "status": "enabled",
+      "usedBy": [
+        "demo-whoami-6ac511fd28173da9680d@kubernetescrd"
+      ]
+    },
+    "demo-basic-auth@kubernetescrd": {
+      "basicAuth": {
+        "users": [
+          "demo:$2y$05$pDGGdOguiiYDGuyPrWxJGO0ivQQSEQETNOzMtnpWyHweap4gZB7GW"
+        ]
+      },
+      "status": "enabled",
+      "usedBy": [
+        "demo-route-basicauth-c2a80b43067a91a632fe@kubernetescrd"
+      ]
+    },
+    "demo-https-redirect@kubernetescrd": {
+      "redirectScheme": {
+        "scheme": "https",
+        "permanent": true
+      },
+      "status": "enabled",
+      "usedBy": [
+        "demo-whoami-acme-http-c414194b8e81f8036db5@kubernetescrd"
+      ]
+    }
+  },
+  "services": {
+    "acme-http@internal": {
+      "status": "enabled",
+      "usedBy": [
+        "acme-http@internal"
+      ]
+    },
+    "api@internal": {
+      "status": "enabled",
+      "usedBy": [
+        "traefik-traefik-dashboard-d012b7f875133eeab4e5@kubernetescrd"
+      ]
+    },
+    "dashboard@internal": {
+      "status": "enabled"
+    },
+    "demo-route-basicauth-c2a80b43067a91a632fe@kubernetescrd": {
+      "loadBalancer": {
+        "servers": [
+          {
+            "url": "http://10.42.0.9:80"
+          }
+        ],
+        "strategy": "wrr",
+        "passHostHeader": true,
+        "responseForwarding": {
+          "flushInterval": "100ms"
+        }
+      },
+      "observability": {
+        "metadata": {
+          "kubernetes": {
+            "namespace": "demo",
+            "name": "whoami",
+            "port": "80"
+          }
+        }
+      },
+      "status": "enabled",
+      "usedBy": [
+        "demo-route-basicauth-c2a80b43067a91a632fe@kubernetescrd"
+      ],
+      "serverStatus": {
+        "http://10.42.0.9:80": "UP"
+      }
+    },
+    "demo-whoami-6ac511fd28173da9680d@kubernetescrd": {
+      "loadBalancer": {
+        "servers": [
+          {
+            "url": "http://10.42.0.9:80"
+          }
+        ],
+        "strategy": "wrr",
+        "passHostHeader": true,
+        "responseForwarding": {
+          "flushInterval": "100ms"
+        }
+      },
+      "observability": {
+        "metadata": {
+          "kubernetes": {
+            "namespace": "demo",
+            "name": "whoami",
+            "port": "80"
+          }
+        }
+      },
+      "status": "enabled",
+      "usedBy": [
+        "demo-whoami-6ac511fd28173da9680d@kubernetescrd"
+      ],
+      "serverStatus": {
+        "http://10.42.0.9:80": "UP"
+      }
+    },
+    "demo-whoami-80@kubernetes": {
+      "loadBalancer": {
+        "servers": [
+          {
+            "url": "http://10.42.0.9:80"
+          }
+        ],
+        "strategy": "wrr",
+        "passHostHeader": true,
+        "responseForwarding": {
+          "flushInterval": "100ms"
+        }
+      },
+      "observability": {
+        "metadata": {
+          "kubernetes": {
+            "namespace": "demo",
+            "name": "whoami",
+            "port": "80"
+          }
+        }
+      },
+      "status": "enabled",
+      "usedBy": [
+        "demo-whoami-passthrough@kubernetes"
+      ],
+      "serverStatus": {
+        "http://10.42.0.9:80": "UP"
+      }
+    },
+    "demo-whoami-acme-c414194b8e81f8036db5@kubernetescrd": {
+      "loadBalancer": {
+        "servers": [
+          {
+            "url": "http://10.42.0.9:80"
+          }
+        ],
+        "strategy": "wrr",
+        "passHostHeader": true,
+        "responseForwarding": {
+          "flushInterval": "100ms"
+        }
+      },
+      "observability": {
+        "metadata": {
+          "kubernetes": {
+            "namespace": "demo",
+            "name": "whoami",
+            "port": "80"
+          }
+        }
+      },
+      "status": "enabled",
+      "usedBy": [
+        "demo-whoami-acme-c414194b8e81f8036db5@kubernetescrd"
+      ],
+      "serverStatus": {
+        "http://10.42.0.9:80": "UP"
+      }
+    },
+    "demo-whoami-acme-http-c414194b8e81f8036db5@kubernetescrd": {
+      "loadBalancer": {
+        "servers": [
+          {
+            "url": "http://10.42.0.9:80"
+          }
+        ],
+        "strategy": "wrr",
+        "passHostHeader": true,
+        "responseForwarding": {
+          "flushInterval": "100ms"
+        }
+      },
+      "observability": {
+        "metadata": {
+          "kubernetes": {
+            "namespace": "demo",
+            "name": "whoami",
+            "port": "80"
+          }
+        }
+      },
+      "status": "enabled",
+      "usedBy": [
+        "demo-whoami-acme-http-c414194b8e81f8036db5@kubernetescrd"
+      ],
+      "serverStatus": {
+        "http://10.42.0.9:80": "UP"
+      }
+    },
+    "httproute-demo-whoami-gw-traefik-traefik-gateway-ep-web-0-331fddd6b23b5d9c50f0-svc-demo-whoami-0@kubernetesgateway": {
+      "loadBalancer": {
+        "servers": [
+          {
+            "url": "http://10.42.0.9:80"
+          }
+        ],
+        "strategy": "wrr",
+        "passHostHeader": true,
+        "responseForwarding": {
+          "flushInterval": "100ms"
+        }
+      },
+      "status": "enabled",
+      "serverStatus": {
+        "http://10.42.0.9:80": "UP"
+      }
+    },
+    "httproute-demo-whoami-gw-traefik-traefik-gateway-ep-web-0-331fddd6b23b5d9c50f0-wrr@kubernetesgateway": {
+      "weighted": {
+        "services": [
+          {
+            "name": "httproute-demo-whoami-gw-traefik-traefik-gateway-ep-web-0-331fddd6b23b5d9c50f0-svc-demo-whoami-0",
+            "weight": 1
+          }
+        ]
+      },
+      "status": "enabled",
+      "usedBy": [
+        "httproute-demo-whoami-gw-traefik-traefik-gateway-ep-web-0-331fddd6b23b5d9c50f0@kubernetesgateway"
+      ]
+    },
+    "noop@internal": {
+      "status": "enabled"
+    },
+    "ping@internal": {
+      "status": "enabled",
+      "usedBy": [
+        "ping@internal"
+      ]
+    },
+    "prometheus@internal": {
+      "status": "enabled",
+      "usedBy": [
+        "prometheus@internal"
+      ]
+    },
+    "whoami-passthrough@file": {
+      "loadBalancer": {
+        "servers": [
+          {
+            "url": "http://whoami.demo.svc.cluster.local:80"
+          }
+        ],
+        "strategy": "wrr",
+        "passHostHeader": true,
+        "responseForwarding": {
+          "flushInterval": "100ms"
+        }
+      },
+      "status": "enabled",
+      "usedBy": [
+        "whoami@file"
+      ],
+      "serverStatus": {
+        "http://whoami.demo.svc.cluster.local:80": "UP"
+      }
+    }
+  }
+}
